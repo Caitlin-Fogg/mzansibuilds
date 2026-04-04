@@ -27,7 +27,7 @@ class ProjectBase(BaseModel):
     status: Optional[str] = "active"
 
 class ProjectCreate(ProjectBase):
-    user_id: int  # Owner of the project
+    pass
 
 class ProjectResponse(ProjectBase):
     id: int
