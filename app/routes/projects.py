@@ -3,18 +3,15 @@ from sqlalchemy.orm import Session
 from typing import List
 from app import models, schemas
 from app.database import get_db
+from app.routes.users import get_current_user
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
 
-# Create a project
+# Create a project (requires login)
 @router.post("/", response_model=schemas.ProjectResponse)
-def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db)):
-    # Check if user exists
-    user = db.query(models.User).filter(models.User.id == project.user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-
+def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    project.user_id = current_user.id
     db_project = models.Project(**project.dict())
     db.add(db_project)
     db.commit()
