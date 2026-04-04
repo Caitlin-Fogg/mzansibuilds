@@ -40,3 +40,21 @@ class ProjectResponse(ProjectBase):
 
     class Config:
         orm_mode = True
+
+# Milestone Schemas
+class MilestoneBase(BaseModel):
+    title: str = Field(..., min_length=3, max_length=100)
+    description: Optional[str] = Field(None, max_length=500)
+
+
+class MilestoneCreate(MilestoneBase):
+    pass
+
+
+class MilestoneResponse(MilestoneBase):
+    id: int
+    project_id: int
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
