@@ -1,14 +1,18 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional, Literal
 from datetime import datetime
+
+# Allowed values
+ProjectStage = Literal["idea", "planning", "development", "completed"]
+ProjectStatus = Literal["active", "completed"]
 
 # User Schemas
 class UserBase(BaseModel):
-    username: str
+    username: str = Field(..., min_length=3, max_length=30)
     email: EmailStr
 
 class UserCreate(UserBase):
-    password: str  # For creating a new user
+    password: str = Field(..., min_length=6, max_length=50)
 
 class UserResponse(UserBase):
     id: int
@@ -20,11 +24,11 @@ class UserResponse(UserBase):
 
 # Project Schemas
 class ProjectBase(BaseModel):
-    title: str
-    description: Optional[str] = None
-    stage: Optional[str] = None
-    support_needed: Optional[str] = None
-    status: Optional[str] = "active"
+    title: str = Field(..., min_length=3, max_length=100)
+    description: Optional[str] = Field(None, max_length=1000)
+    stage: Optional[ProjectStage] = None
+    support_needed: Optional[str] = Field(None, max_length=500)
+    status: Optional[ProjectStatus] = "active"
 
 class ProjectCreate(ProjectBase):
     pass
