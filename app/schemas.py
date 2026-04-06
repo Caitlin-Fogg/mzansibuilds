@@ -5,6 +5,7 @@ from datetime import datetime
 # Allowed values
 ProjectStage = Literal["idea", "planning", "development", "completed"]
 ProjectStatus = Literal["active", "completed"]
+CollabStatus = Literal["pending", "accepted", "rejected"]
 
 # User Schemas
 class UserBase(BaseModel):
@@ -80,6 +81,25 @@ class CommentResponse(CommentBase):
     id: int
     project_id: int
     user_id: int
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+# Collaboration Request Schemas
+class CollaborationRequestBase(BaseModel):
+    message: Optional[str] = Field(None, max_length=500)
+
+
+class CollaborationRequestCreate(CollaborationRequestBase):
+    pass
+
+
+class CollaborationRequestResponse(CollaborationRequestBase):
+    id: int
+    project_id: int
+    user_id: int
+    status: CollabStatus
     created_at: datetime
 
     class Config:
