@@ -98,3 +98,44 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
+# Update user
+@router.put("/me", response_model=schemas.UserResponse)
+def update_user(updated_user: schemas.UserUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # Check if new username/email already exists
+    if updated_user.username:
+        existing = db.query(models.User).filter(models.User.username == updated_user.username, models.User.id != current_user.id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Username already taken")
+
+    if updated_user.email:
+        existing = db.query(models.User).filter(models.User.email == updated_user.email, models.User.id != current_user.id).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already taken")
+
+    # Update fields
+    if updated_user.username:
+        current_user.username = updated_user.username
+
+    if updated_user.email:
+        current_user.email = updated_user.email
+
+    if updated_user.password:
+        current_user.password = hash_password(updated_user.password)
+
+    db.commit()
+    db.refresh(current_user)
+
+    return current_user
+
+# Delete user
+@router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_data: schemas.UserDelete, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    # Verify password
+    if not verify_password(user_data.password, current_user.password):
+        raise HTTPException(status_code=401, detail="Incorrect password"
+        )
+
+    db.delete(current_user)
+    db.commit()
+    return

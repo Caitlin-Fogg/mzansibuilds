@@ -14,6 +14,14 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str = Field(..., min_length=6, max_length=50)
 
+class UserUpdate(BaseModel):
+    username: Optional[str] = Field(None, min_length=3, max_length=50)
+    email: Optional[EmailStr] = None
+    password: Optional[str] = Field(None, min_length=6)
+
+class UserDelete(BaseModel):
+    password: str
+
 class UserResponse(UserBase):
     id: int
     created_at: datetime
@@ -54,6 +62,24 @@ class MilestoneCreate(MilestoneBase):
 class MilestoneResponse(MilestoneBase):
     id: int
     project_id: int
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+# Comment Schemas
+class CommentBase(BaseModel):
+    content: str = Field(..., min_length=1, max_length=1000)
+
+
+class CommentCreate(CommentBase):
+    pass
+
+
+class CommentResponse(CommentBase):
+    id: int
+    project_id: int
+    user_id: int
     created_at: datetime
 
     class Config:
