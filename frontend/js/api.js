@@ -23,7 +23,9 @@ async function apiRequest(endpoint, method = "GET", data = null) {
     const response = await fetch(BASE_URL + endpoint, options);
 
     if (!response.ok) {
-        throw new Error("API request failed");
+        const text = await response.text();
+        console.error("API ERROR:", response.status, text);
+        throw new Error(`API request failed: ${response.status}`);
     }
 
     return response.json();

@@ -1,10 +1,18 @@
 body {
     font-family: Arial;
     margin: 20px;
+    background-color: #0f172a; 
+    color: white;
+}
+
+h1 {
+    color: #7ace99; 
 }
 
 div {
-    padding: 10px;
-    border: 1px solid #ccc;
+    padding: 15px;
+    border: 1px solid #7ace99;
     margin-bottom: 10px;
+    border-radius: 8px;
+    background-color: #020617;
 }
