@@ -1,7 +1,7 @@
 body {
     font-family: Arial;
     margin: 20px;
-    background-color: #0f172a; 
+    background-color: #091811; 
     color: white;
 }
 
@@ -12,7 +12,29 @@ h1 {
 div {
     padding: 15px;
     border: 1px solid #7ace99;
+    margin-top: 10px;
     margin-bottom: 10px;
     border-radius: 8px;
     background-color: #020617;
+}
+
+input, textarea, button {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 300px;
+    border-radius: 6px;
+    border: 1px solid  #7ace99;
+    background-color: #091811;
+    color: white;
+}
+
+button {
+    background-color:  #7ace99;
+    color: black;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
 }

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Project</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<h2>Create New Project</h2>
+
+<form id="projectForm">
+    <input type="text" id="title" placeholder="Project Title" required />
+    
+    <textarea id="description" placeholder="Description"></textarea>
+    
+    <input type="text" id="stage" placeholder="Stage (idea, development...)" required />
+    
+    <input type="text" id="support" placeholder="Support Needed" required />
+
+    <button type="submit">Create Project</button>
+</form>
+
+<br>
+<a href="index.html">← Back to Feed</a>
+
+<script src="js/api.js"></script>
+<script src="js/createProject.js"></script>
+
+</body>
+</html>
