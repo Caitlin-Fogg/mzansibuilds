@@ -28,7 +28,7 @@ class UserResponse(UserBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True  # Required for SQLAlchemy model compatibility
+        from_attributes = True  # Required for SQLAlchemy model compatibility
 
 
 # Project Schemas
@@ -44,11 +44,17 @@ class ProjectCreate(ProjectBase):
 
 class ProjectResponse(ProjectBase):
     id: int
-    created_at: datetime
+    title: str
+    description: str | None = None
+    stage: str
+    support_needed: str
+    status: str
     user_id: int
+    username: str 
+    created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Milestone Schemas
 class MilestoneBase(BaseModel):
@@ -66,7 +72,7 @@ class MilestoneResponse(MilestoneBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Comment Schemas
 class CommentBase(BaseModel):
@@ -81,10 +87,11 @@ class CommentResponse(CommentBase):
     id: int
     project_id: int
     user_id: int
+    username: str 
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Collaboration Request Schemas
 class CollaborationRequestBase(BaseModel):
@@ -103,4 +110,4 @@ class CollaborationRequestResponse(CollaborationRequestBase):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -20,6 +20,7 @@ async function loadProjects() {
                 </h3>
                 <p>${project.description || ""}</p>
                 <p>Status: ${project.status}</p>
+                <small>By: ${project.username}</small>
             `;
 
             div.style.cursor = "pointer";

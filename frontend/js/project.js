@@ -35,7 +35,7 @@ async function loadComments() {
 
             div.innerHTML = `
                 <p>${comment.content}</p>
-                <small>User ID: ${comment.user_id}</small>
+                <small>By: ${comment.username}</small>
                 <hr/>
             `;
 
