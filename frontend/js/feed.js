@@ -13,10 +13,22 @@ async function loadProjects() {
             const div = document.createElement("div");
 
             div.innerHTML = `
-                <h3>${project.title}</h3>
+                <h3>
+                    <a href="project.html?id=${project.id}">
+                        ${project.title}
+                    </a>
+                </h3>
                 <p>${project.description || ""}</p>
                 <p>Status: ${project.status}</p>
             `;
+
+            div.style.cursor = "pointer";
+            div.addEventListener("click", (e) => {
+                // Only trigger if not clicking the link itself
+                if (e.target.tagName !== "A") {
+                    window.location.href = `project.html?id=${project.id}`;
+                }
+            });
 
             container.appendChild(div);
         });
@@ -28,3 +40,4 @@ async function loadProjects() {
 }
 
 loadProjects();
+
