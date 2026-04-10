@@ -15,20 +15,21 @@ async function loadProject() {
         document.getElementById("support").innerText = "Support: " + project.support_needed;
         document.getElementById("status").innerText = "Status: " + project.status;
 
+        const currentUserId = getCurrentUserId();
+
+        console.log("DEBUG currentUserId:", currentUserId);
+        console.log("DEBUG project.user_id:", project.user_id);
+
+        if (Number(currentUserId) === Number(project.user_id)) {
+            document.getElementById("collabRequestsSection").style.display = "block";
+            loadCollabRequests(id);
+        } else {
+            document.getElementById("collabRequestSection").style.display = "block";
+        }
+
     } catch (error) {
         console.error(error);
         alert("Failed to load project");
-    }
-
-    const currentUserId = getCurrentUserId();
-
-    if (Number(currentUserId) === Number(project.user_id)) {
-        // Owner
-        document.getElementById("collabRequestsSection").style.display = "block";
-        loadCollabRequests(id);
-    } else {
-        // Not owner
-        document.getElementById("collabRequestSection").style.display = "block";
     }
 }
 
@@ -66,10 +67,19 @@ function parseJwt(token) {
 
 function getCurrentUserId() {
     const token = localStorage.getItem("token");
-    if (!token) return null;
+    if (!token) {
+        console.warn("No token found");
+        return null;
+    }
 
-    const decoded = parseJwt(token);
-    return decoded.user_id; 
+    try {
+        const decoded = parseJwt(token);
+        console.log("Decoded JWT:", decoded);
+        return decoded.user_id || decoded.sub;
+    } catch (e) {
+        console.error("JWT decode failed:", e);
+        return null;
+    }
 }
 
 document.getElementById("commentForm")?.addEventListener("submit", async (e) => {

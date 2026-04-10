@@ -9,7 +9,7 @@ async function loadMyRequests() {
             const div = document.createElement("div");
 
             div.innerHTML = `
-                <p><b>Project ID:</b> ${req.project_title}</p>
+                <p><b>Project Title:</b> ${req.project_title}</p>
                 <p>${req.message}</p>
                 <p>Status: ${req.status}</p>
                 <hr/>
