@@ -1,3 +1,4 @@
+console.log("API JS LOADED");
 const BASE_URL = "http://127.0.0.1:8000";
 
 function getToken() {
@@ -29,4 +30,28 @@ async function apiRequest(endpoint, method = "GET", data = null) {
     }
 
     return response.json();
+}
+
+// Collaboration APIs
+
+function requestCollaboration(projectId, message) {
+    return apiRequest(`/projects/${projectId}/collaborate`, "POST", {
+        message: message
+    });
+}
+
+function getProjectRequests(projectId) {
+    return apiRequest(`/projects/${projectId}/requests`);
+}
+
+function getMyRequests() {
+    return apiRequest(`/requests/me`);
+}
+
+function acceptRequest(requestId) {
+    return apiRequest(`/requests/${requestId}/accept`, "PUT");
+}
+
+function rejectRequest(requestId) {
+    return apiRequest(`/requests/${requestId}/reject`, "PUT");
 }

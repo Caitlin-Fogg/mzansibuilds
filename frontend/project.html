@@ -25,8 +25,26 @@
     <button type="submit">Post Comment</button>
 </form>
 
-<script src="js/api.js"></script>
-<script src="js/project.js"></script>
+<hr>
+
+<h3>Collaboration</h3>
+
+<!-- Request form (non-owner) -->
+<div id="collabRequestSection" style="display:none;">
+    <form id="collabForm">
+        <textarea id="collabMessage" placeholder="Why do you want to collaborate?" required></textarea>
+        <button type="submit">Request Collaboration</button>
+    </form>
+</div>
+
+<!-- Requests list (owner only) -->
+<div id="collabRequestsSection" style="display:none;">
+    <h4>Collaboration Requests</h4>
+    <div id="collabRequests"></div>
+</div>
+
+<script src="/frontend/js/api.js"></script>
+<script src="/frontend/js/project.js"></script>
 
 </body>
 </html>

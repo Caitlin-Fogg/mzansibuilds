@@ -105,6 +105,7 @@ class CollaborationRequestCreate(CollaborationRequestBase):
 class CollaborationRequestResponse(CollaborationRequestBase):
     id: int
     project_id: int
+    project_title: str
     user_id: int
     username: str
     status: CollabStatus

@@ -44,6 +44,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
+        user_id: int = payload.get("user_id") 
         if email is None:
             raise credentials_exception
     except JWTError:
@@ -57,18 +58,12 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 @router.post("/", response_model=schemas.UserResponse)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Check if username or email already exists
-    existing_user = db.query(models.User).filter(
-        (models.User.username == user.username) | (models.User.email == user.email)
-    ).first()
+    existing_user = db.query(models.User).filter((models.User.username == user.username) | (models.User.email == user.email)).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username or email already registered")
     
     # Create new user
-    new_user = models.User(
-        username=user.username,
-        email=user.email,
-        password=hash_password(user.password)  # hashed password
-    )
+    new_user = models.User(username=user.username, email=user.email, password=hash_password(user.password))
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
@@ -83,7 +78,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password"
         )
-    token = create_access_token(data={"sub": user.email}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    token = create_access_token(data={"sub": user.email, "user_id": user.id}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return {"access_token": token, "token_type": "bearer"}
 
 # Get current user profile

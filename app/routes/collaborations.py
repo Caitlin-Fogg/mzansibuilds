@@ -8,10 +8,11 @@ from app.routes.users import get_current_user
 router = APIRouter(tags=["Collaboration Requests"])
 
 # Helper function
-def collab_to_response(req: models.CollaborationRequest, username: str):
+def collab_to_response(req: models.CollaborationRequest, username: str, project_title: str):
     return schemas.CollaborationRequestResponse(
         id=req.id,
         project_id=req.project_id,
+        project_title=project_title,
         user_id=req.user_id,
         username=username,
         message=req.message,
@@ -41,7 +42,7 @@ def request_collaboration(project_id: int, request: schemas.CollaborationRequest
     db.add(db_request)
     db.commit()
     db.refresh(db_request)
-    return collab_to_response(db_request, current_user.username)
+    return collab_to_response(db_request, current_user.username, project.title)
 
 
 # View requests for a project (owner only)
@@ -55,26 +56,23 @@ def get_requests(project_id: int, db: Session = Depends(get_db), current_user: m
     if project.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    results = (db.query(models.CollaborationRequest, models.User.username).join(models.User, models.CollaborationRequest.user_id == models.User.id).filter(models.CollaborationRequest.project_id == project_id).all())
+    results = (
+    db.query(models.CollaborationRequest, models.User.username, models.Project.title).join(models.User, models.CollaborationRequest.user_id == models.User.id).join(models.Project, models.CollaborationRequest.project_id == models.Project.id).filter(models.CollaborationRequest.project_id == project_id).all())
 
-    return [collab_to_response(req, username) for req, username in results]
+    return [collab_to_response(req, username, project_title) for req, username, project_title in results]
 
 # Get user's requests
 @router.get("/requests/me", response_model=List[schemas.CollaborationRequestResponse])
 def get_my_requests(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    results = (db.query(models.CollaborationRequest, models.User.username).join(models.User, models.CollaborationRequest.user_id == models.User.id).filter(models.CollaborationRequest.user_id == current_user.id).order_by(models.CollaborationRequest.created_at.desc()).all())
+    results = (
+    db.query(models.CollaborationRequest, models.User.username, models.Project.title).join(models.User, models.CollaborationRequest.user_id == models.User.id).join(models.Project, models.CollaborationRequest.project_id == models.Project.id).filter(models.CollaborationRequest.user_id == current_user.id).order_by(models.CollaborationRequest.created_at.desc()).all())
 
-    return [
-        collab_to_response(req, username)
-        for req, username in results
-    ]
+    return [collab_to_response(req, username, project_title) for req, username, project_title in results]
 
 # Accept request
 @router.put("/requests/{request_id}/accept", response_model=schemas.CollaborationRequestResponse)
 def accept_request(request_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    req = db.query(models.CollaborationRequest).filter(
-        models.CollaborationRequest.id == request_id
-    ).first()
+    req = db.query(models.CollaborationRequest).filter(models.CollaborationRequest.id == request_id).first()
 
     if not req:
         raise HTTPException(status_code=404, detail="Request not found")
@@ -89,7 +87,7 @@ def accept_request(request_id: int, db: Session = Depends(get_db), current_user:
     db.commit()
     db.refresh(req)
     user = db.query(models.User).filter(models.User.id == req.user_id).first()
-    return collab_to_response(req, user.username)
+    return collab_to_response(req, user.username, project.title)
 
 
 # Reject request
@@ -110,4 +108,4 @@ def reject_request(request_id: int, db: Session = Depends(get_db), current_user:
     db.commit()
     db.refresh(req)
     user = db.query(models.User).filter(models.User.id == req.user_id).first()
-    return collab_to_response(req, user.username)
+    return collab_to_response(req, user.username, project.title)
