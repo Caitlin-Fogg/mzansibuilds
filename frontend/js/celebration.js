@@ -1,13 +1,28 @@
-async function loadCompleted() {
-    const projects = await apiRequest("/projects/completed");
+document.addEventListener("DOMContentLoaded", async () => {
+    const container = document.getElementById("completedProjects");
 
-    const container = document.getElementById("completed");
+    try {
+        const projects = await getCompletedProjects();
 
-    projects.forEach(p => {
-        const div = document.createElement("div");
-        div.innerHTML = `<h3>${p.title}</h3>`;
-        container.appendChild(div);
-    });
-}
+        if (projects.length === 0) {
+            container.innerHTML = "<p>No completed projects yet</p>";
+            return;
+        }
 
-loadCompleted();
+        projects.forEach(project => {
+            const div = document.createElement("div");
+
+            div.innerHTML = `
+                <h3>${project.title}</h3>
+                <p>${project.description}</p>
+                <small>By: ${project.username}</small>
+            `;
+
+            container.appendChild(div);
+        });
+
+    } catch (err) {
+        container.innerHTML = "<p>Failed to load Celebration Wall.</p>";
+        console.error(err);
+    }
+});

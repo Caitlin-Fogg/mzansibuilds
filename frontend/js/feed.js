@@ -29,7 +29,6 @@ async function loadProjects() {
                     <p>${project.title}</p>
                 </h3>
                 <p>${project.description || ""}</p>
-                <p>Status: ${project.status}</p>
                 <small>By: ${project.username}</small>
             `;
 

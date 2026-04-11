@@ -58,3 +58,8 @@ function acceptRequest(requestId) {
 function rejectRequest(requestId) {
     return apiRequest(`/requests/${requestId}/reject`, "PUT");
 }
+
+// Celebration Wall API
+function getCompletedProjects() {
+    return apiRequest("/projects/completed");
+}
