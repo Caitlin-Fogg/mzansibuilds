@@ -6,9 +6,23 @@
 </head>
 <body>
 
-<h1 style="text-align: center;">Live Projects</h1>
+<div class="navbar">
 
-<div id="projects"></div>
+    <div class="nav-left">
+        <img src="assets/logo.png" class="logo-small">
+    </div>
+
+    <div class="nav-right">
+        <a href="profile.html">
+            <button>Profile</button>
+        </a>
+
+        <button id="logoutBtn">Logout</button>
+    </div>
+
+</div>
+
+<h1 style="text-align: center;">Live Projects</h1>
 
 <div class="actions">
     <button onclick="window.location.href='create-project.html'">
@@ -18,11 +32,9 @@
     <button onclick="window.location.href='my-requests.html'">
         My Collaboration Requests
     </button>
-
-    <button id="logoutBtn">Logout</button>
 </div>
 
-
+<div id="projects"></div>
 
 <script src="js/api.js"></script>
 <script src="js/feed.js"></script>

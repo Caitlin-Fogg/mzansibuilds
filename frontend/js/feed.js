@@ -26,9 +26,7 @@ async function loadProjects() {
 
             div.innerHTML = `
                 <h3>
-                    <a href="project.html?id=${project.id}">
-                        ${project.title}
-                    </a>
+                    <p>${project.title}</p>
                 </h3>
                 <p>${project.description || ""}</p>
                 <p>Status: ${project.status}</p>
