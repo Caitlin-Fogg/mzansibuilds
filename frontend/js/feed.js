@@ -1,3 +1,15 @@
+// Function to check if users are logged in
+// To view the live feed, a user must be logged in. If they are not, they will be redirected to the home page
+function checkAuth() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        window.location.href = "home-page.html";
+    }
+}
+
+checkAuth();
+
 async function loadProjects() {
     try {
         console.log("Loading projects...");
@@ -39,6 +51,11 @@ async function loadProjects() {
         alert("Failed to load projects");
     }
 }
+
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "home-page.html";
+});
 
 loadProjects();
 
