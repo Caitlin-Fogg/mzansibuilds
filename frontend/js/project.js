@@ -48,9 +48,9 @@ async function loadMilestones(projectId) {
         container.innerHTML = "";
 
         const currentUserId = getCurrentUserId();
-        const milestones = Array.isArray(data) ? data : data.milestones;
-
         const ownerId = data.project_owner_id;
+        const milestones = data.milestones;
+
         isOwner = Number(ownerId) === Number(currentUserId);
 
         milestones.forEach(m => {
@@ -67,12 +67,12 @@ async function loadMilestones(projectId) {
 
                 <small>Created: ${new Date(m.created_at).toLocaleString()}</small>
 
-                <div>
-                    ${isOwner ? `
+                ${isOwner ? `
+                    <div>
                         <button onclick="saveMilestone(${m.id})">Save</button>
                         <button onclick="deleteMilestoneUI(${m.id})">Delete</button>
-                    ` : ""}
-                </div>
+                    </div>
+                ` : ""}
 
                 <hr/>
             `;
