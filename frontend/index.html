@@ -8,13 +8,21 @@
 
 <h1 style="text-align: center;">Live Projects</h1>
 
-<a href="create-project.html">Create New Project</a>
-<br>
-<a href="my-requests.html">My Collaboration Requests</a>
-
 <div id="projects"></div>
 
-<button id="logoutBtn">Logout</button>
+<div class="actions">
+    <button onclick="window.location.href='create-project.html'">
+        Create New Project
+    </button>
+
+    <button onclick="window.location.href='my-requests.html'">
+        My Collaboration Requests
+    </button>
+
+    <button id="logoutBtn">Logout</button>
+</div>
+
+
 
 <script src="js/api.js"></script>
 <script src="js/feed.js"></script>
