@@ -1,4 +1,3 @@
-console.log("API JS LOADED");
 const BASE_URL = "http://127.0.0.1:8000";
 
 function getToken() {
@@ -27,6 +26,10 @@ async function apiRequest(endpoint, method = "GET", data = null) {
         const text = await response.text();
         console.error("API ERROR:", response.status, text);
         throw new Error(`API request failed: ${response.status}`);
+    }
+
+    if (response.status === 204) {
+        return null;
     }
 
     return response.json();

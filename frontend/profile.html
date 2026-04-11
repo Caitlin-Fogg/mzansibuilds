@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<h2>My Profile</h2>
+
+<div id="profileInfo"></div>
+
+<h3>Update Profile</h3>
+<form id="updateForm">
+    <input type="text" id="username" placeholder="New Username" />
+    <input type="email" id="email" placeholder="New Email" />
+    <input type="password" id="password" placeholder="New Password" />
+    <button type="submit">Update</button>
+</form>
+
+<h3>Delete Account</h3>
+<form id="deleteForm">
+    <input type="password" id="deletePassword" placeholder="Confirm Password" required />
+    <button type="submit">Delete Account</button>
+</form>
+
+<a href="index.html">Back to Feed</a>
+
+<script src="js/api.js"></script>
+<script src="js/profile.js"></script>
+
+</body>
+</html>
