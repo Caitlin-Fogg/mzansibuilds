@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 from datetime import datetime
 
 # Allowed values
@@ -70,9 +70,17 @@ class MilestoneResponse(MilestoneBase):
     id: int
     project_id: int
     created_at: datetime
+    
+    class Config:
+        from_attributes = True
+
+class MilestoneListResponse(BaseModel):
+    project_owner_id: int
+    milestones: list[MilestoneResponse]
 
     class Config:
         from_attributes = True
+    
 
 # Comment Schemas
 class CommentBase(BaseModel):

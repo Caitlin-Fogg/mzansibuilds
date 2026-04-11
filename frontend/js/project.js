@@ -1,3 +1,6 @@
+let currentProjectId = null;
+let isOwner = false;
+
 function getProjectId() {
     const params = new URLSearchParams(window.location.search);
     return params.get("id");
@@ -27,9 +30,118 @@ async function loadProject() {
             document.getElementById("collabRequestSection").style.display = "block";
         }
 
+        currentProjectId = id;
+
+        loadMilestones(id, currentUserId);
+
     } catch (error) {
         console.error(error);
         alert("Failed to load project");
+    }
+}
+
+async function loadMilestones(projectId) {
+    try {
+        const data = await getMilestones(projectId);
+
+        const container = document.getElementById("milestones");
+        container.innerHTML = "";
+
+        const currentUserId = getCurrentUserId();
+        const milestones = Array.isArray(data) ? data : data.milestones;
+
+        const ownerId = data.project_owner_id;
+        isOwner = Number(ownerId) === Number(currentUserId);
+
+        milestones.forEach(m => {
+            const div = document.createElement("div");
+
+            div.innerHTML = `
+                <h4 ${isOwner ? 'contenteditable="true"' : ''} id="title-${m.id}">
+                    ${m.title}
+                </h4>
+
+                <p ${isOwner ? 'contenteditable="true"' : ''} id="desc-${m.id}">
+                    ${m.description || ""}
+                </p>
+
+                <small>Created: ${new Date(m.created_at).toLocaleString()}</small>
+
+                <div>
+                    ${isOwner ? `
+                        <button onclick="saveMilestone(${m.id})">Save</button>
+                        <button onclick="deleteMilestoneUI(${m.id})">Delete</button>
+                    ` : ""}
+                </div>
+
+                <hr/>
+            `;
+
+            container.appendChild(div);
+        });
+
+        if (isOwner) {
+            const addBox = document.createElement("div");
+
+            addBox.innerHTML = `
+                <h4>Add Milestone</h4>
+                <input id="newMilestoneTitle" placeholder="Title" />
+                <textarea id="newMilestoneDesc" placeholder="Description"></textarea>
+                <button onclick="addMilestone()">Add</button>
+            `;
+
+            container.appendChild(addBox);
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Failed to load milestones");
+    }
+}
+
+async function addMilestone() {
+    const title = document.getElementById("newMilestoneTitle").value;
+    const description = document.getElementById("newMilestoneDesc").value;
+
+    try {
+        await createMilestone(currentProjectId, {
+            title,
+            description
+        });
+
+        loadMilestones(currentProjectId);
+    } catch (err) {
+        console.error(err);
+        alert("Failed to add milestone");
+    }
+}
+
+async function saveMilestone(id) {
+    const title = document.getElementById(`title-${id}`).innerText;
+    const description = document.getElementById(`desc-${id}`).innerText;
+
+    try {
+        await updateMilestone(id, {
+            title,
+            description
+        });
+
+        loadMilestones(currentProjectId);
+    } catch (err) {
+        console.error(err);
+        alert("Failed to update milestone");
+    }
+}
+
+async function deleteMilestoneUI(id) {
+    if (!confirm("Delete this milestone?")) return;
+
+    try {
+        await deleteMilestone(id);
+        loadMilestones(currentProjectId);
+    } catch (err) {
+        console.error(err);
+        alert("Failed to delete milestone");
     }
 }
 

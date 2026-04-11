@@ -63,3 +63,20 @@ function rejectRequest(requestId) {
 function getCompletedProjects() {
     return apiRequest("/projects/completed");
 }
+
+// Milestone APIs
+function getMilestones(projectId) {
+    return apiRequest(`/projects/${projectId}/milestones`);
+}
+
+function createMilestone(projectId, data) {
+    return apiRequest(`/projects/${projectId}/milestones`, "POST", data);
+}
+
+function updateMilestone(milestoneId, data) {
+    return apiRequest(`/milestones/${milestoneId}`, "PUT", data);
+}
+
+function deleteMilestone(milestoneId) {
+    return apiRequest(`/milestones/${milestoneId}`, "DELETE");
+}

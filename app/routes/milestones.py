@@ -7,6 +7,15 @@ from app.routes.users import get_current_user
 
 router = APIRouter(tags=["Milestones"])
 
+# Helper function
+def milestone_to_response(milestone: models.Milestone) -> schemas.MilestoneResponse:
+    return schemas.MilestoneResponse(
+        id=milestone.id,
+        title=milestone.title,
+        description=milestone.description,
+        project_id=milestone.project_id,
+        created_at=milestone.created_at
+    )
 
 # Create milestone
 @router.post("/projects/{project_id}/milestones", response_model=schemas.MilestoneResponse)
@@ -24,19 +33,26 @@ def create_milestone(project_id: int, milestone: schemas.MilestoneCreate, db: Se
     db.add(db_milestone)
     db.commit()
     db.refresh(db_milestone)
-    return db_milestone
+    return milestone_to_response(db_milestone)
 
 
 # Get milestones for a project
-@router.get("/projects/{project_id}/milestones", response_model=List[schemas.MilestoneResponse])
+@router.get("/projects/{project_id}/milestones", response_model=schemas.MilestoneListResponse)
 def get_milestones(project_id: int, db: Session = Depends(get_db)):
+
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
 
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    return db.query(models.Milestone).filter(models.Milestone.project_id == project_id).all()
+    milestones = db.query(models.Milestone).filter(
+        models.Milestone.project_id == project_id
+    ).order_by(models.Milestone.created_at.desc()).all()
 
+    return {
+        "project_owner_id": project.user_id,
+        "milestones": [milestone_to_response(m) for m in milestones]
+    }
 
 # Update milestone
 @router.put("/milestones/{milestone_id}", response_model=schemas.MilestoneResponse)
@@ -51,12 +67,13 @@ def update_milestone(milestone_id: int, updated: schemas.MilestoneCreate, db: Se
     if project.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    for key, value in updated.dict().items():
-        setattr(milestone, key, value)
+    milestone.title = updated.title
+    milestone.description = updated.description
 
     db.commit()
     db.refresh(milestone)
-    return milestone
+
+    return milestone_to_response(milestone)
 
 
 # Delete milestone
