@@ -67,13 +67,19 @@ async function loadMyProjects() {
 async function handleUpdate(event, id) {
     event.preventDefault();
 
-    const data = {
-        title: document.getElementById(`title-${id}`).value || null,
-        description: document.getElementById(`desc-${id}`).value || null,
-        stage: document.getElementById(`stage-${id}`).value || null,
-        support_needed: document.getElementById(`support-${id}`).value || null,
-        status: document.getElementById(`status-${id}`).value || null
-    };
+    const data = {};
+
+    const title = document.getElementById(`title-${id}`).value;
+    const description = document.getElementById(`desc-${id}`).value;
+    const stage = document.getElementById(`stage-${id}`).value;
+    const support = document.getElementById(`support-${id}`).value;
+    const status = document.getElementById(`status-${id}`).value;
+
+    if (title) data.title = title;
+    if (description) data.description = description;
+    if (stage) data.stage = stage;
+    if (support) data.support_needed = support;
+    if (status) data.status = status;
 
     try {
         await updateProject(id, data);

@@ -92,3 +92,8 @@ function updateMilestone(milestoneId, data) {
 function deleteMilestone(milestoneId) {
     return apiRequest(`/milestones/${milestoneId}`, "DELETE");
 }
+
+document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "home-page.html";
+});

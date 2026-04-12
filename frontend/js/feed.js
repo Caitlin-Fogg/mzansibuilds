@@ -49,10 +49,5 @@ async function loadProjects() {
     }
 }
 
-document.getElementById("logoutBtn")?.addEventListener("click", () => {
-    localStorage.removeItem("token");
-    window.location.href = "home-page.html";
-});
-
 loadProjects();
 
