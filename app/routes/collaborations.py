@@ -109,3 +109,18 @@ def reject_request(request_id: int, db: Session = Depends(get_db), current_user:
     db.refresh(req)
     user = db.query(models.User).filter(models.User.id == req.user_id).first()
     return collab_to_response(req, user.username, project.title)
+
+# Delete request
+@router.delete("/requests/{request_id}", status_code=204)
+def delete_request(request_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    request = db.query(models.CollaborationRequest).filter(models.CollaborationRequest.id == request_id).first()
+
+    if not request:
+        raise HTTPException(status_code=404, detail="Request not found")
+
+    if request.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    db.delete(request)
+    db.commit()
+    return

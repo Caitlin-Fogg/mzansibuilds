@@ -71,6 +71,10 @@ function rejectRequest(requestId) {
     return apiRequest(`/requests/${requestId}/reject`, "PUT");
 }
 
+function deleteCollaborationRequest(requestId) {
+    return apiRequest(`/requests/${requestId}`, "DELETE");
+}
+
 // Celebration Wall API
 function getCompletedProjects() {
     return apiRequest("/projects/completed");
@@ -92,6 +96,8 @@ function updateMilestone(milestoneId, data) {
 function deleteMilestone(milestoneId) {
     return apiRequest(`/milestones/${milestoneId}`, "DELETE");
 }
+
+
 
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
     localStorage.removeItem("token");
