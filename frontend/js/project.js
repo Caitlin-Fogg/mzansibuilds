@@ -6,6 +6,11 @@ function getProjectId() {
     return params.get("id");
 }
 
+function isReadOnly() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("readonly") === "true";
+}
+
 async function loadProject() {
     const id = getProjectId();
 
@@ -23,11 +28,15 @@ async function loadProject() {
         console.log("DEBUG currentUserId:", currentUserId);
         console.log("DEBUG project.user_id:", project.user_id);
 
-        if (Number(currentUserId) === Number(project.user_id)) {
-            document.getElementById("collabRequestsSection").style.display = "block";
-            loadCollabRequests(id);
-        } else {
-            document.getElementById("collabRequestSection").style.display = "block";
+        const readOnly = isReadOnly();
+
+        if (!readOnly) {
+            if (Number(currentUserId) === Number(project.user_id)) {
+                document.getElementById("collabRequestsSection").style.display = "block";
+                loadCollabRequests(id);
+            } else {
+                document.getElementById("collabRequestSection").style.display = "block";
+            }
         }
 
         currentProjectId = id;
@@ -51,7 +60,8 @@ async function loadMilestones(projectId) {
         const ownerId = data.project_owner_id;
         const milestones = data.milestones;
 
-        isOwner = Number(ownerId) === Number(currentUserId);
+        const readOnly = isReadOnly();
+        isOwner = Number(ownerId) === Number(currentUserId) && !readOnly;
 
         milestones.forEach(m => {
             const div = document.createElement("div");

@@ -18,8 +18,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <small>By: ${project.username}</small>
             `;
 
+            div.style.cursor = "pointer";
+
+            div.addEventListener("click", () => {
+            window.location.href = `project.html?id=${project.id}&readonly=true`;
+            });
+
             container.appendChild(div);
-        });
+    });
 
     } catch (err) {
         container.innerHTML = "<p>Failed to load Celebration Wall.</p>";
