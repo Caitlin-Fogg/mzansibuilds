@@ -77,7 +77,7 @@ def get_project(project_id: int, db: Session = Depends(get_db)):
 
 # Update a project (only owner can update)
 @router.put("/{project_id}", response_model=schemas.ProjectResponse)
-def update_project(project_id: int, updated_project: schemas.ProjectCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+def update_project(project_id: int, updated_project: schemas.ProjectUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     project = db.query(models.Project).filter(models.Project.id == project_id).first()
 
     if not project:
@@ -86,7 +86,7 @@ def update_project(project_id: int, updated_project: schemas.ProjectCreate, db: 
     if project.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized to update this project")
 
-    for key, value in updated_project.dict().items():
+    for key, value in updated_project.dict(exclude_unset=True).items():
         setattr(project, key, value)
 
     db.commit()

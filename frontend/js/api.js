@@ -35,8 +35,20 @@ async function apiRequest(endpoint, method = "GET", data = null) {
     return response.json();
 }
 
-// Collaboration APIs
+// Project APIs
+function getMyProjects() {
+    return apiRequest("/projects/me");
+}
 
+function updateProject(projectId, data) {
+    return apiRequest(`/projects/${projectId}`, "PUT", data);
+}
+
+function deleteProject(projectId) {
+    return apiRequest(`/projects/${projectId}`, "DELETE");
+}
+
+// Collaboration APIs
 function requestCollaboration(projectId, message) {
     return apiRequest(`/projects/${projectId}/collaborate`, "POST", {
         message: message

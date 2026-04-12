@@ -42,6 +42,13 @@ class ProjectBase(BaseModel):
 class ProjectCreate(ProjectBase):
     pass
 
+class ProjectUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    stage: Optional[ProjectStage] = None
+    support_needed: Optional[str] = None
+    status: Optional[ProjectStatus] = None
+
 class ProjectResponse(ProjectBase):
     id: int
     title: str

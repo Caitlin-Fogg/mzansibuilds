@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Create Project</title>
+    <title>My Projects</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -30,25 +30,13 @@
 
 </div>
 
-<h2>Create New Project</h2>
+<h1 style="text-align: center;">My Projects</h1>
+<p style="text-align: center;">Manage your projects</p>
 
-<form id="projectForm">
-    <input type="text" id="title" placeholder="Project Title" required />
-    
-    <textarea id="description" placeholder="Description"></textarea>
-    
-    <input type="text" id="stage" placeholder="Stage (idea, development...)" required />
-    
-    <input type="text" id="support" placeholder="Support Needed" required />
-
-    <button type="submit">Create Project</button>
-</form>
-
-<br>
-<a href="index.html">Back to Feed</a>
+<div id="projects"></div>
 
 <script src="js/api.js"></script>
-<script src="js/createProject.js"></script>
+<script src="js/myProjects.js"></script>
 
 </body>
 </html>
