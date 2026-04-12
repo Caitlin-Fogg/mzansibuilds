@@ -47,21 +47,6 @@ def get_comments(project_id: int, db: Session = Depends(get_db)):
 
     return [comment_to_response(comment, username) for comment, username in results]
 
-# Update comment (only owner)
-@router.put("/comments/{comment_id}", response_model=schemas.CommentResponse)
-def update_comment(comment_id: int, updated: schemas.CommentCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user),):
-    comment = db.query(models.Comment).filter(models.Comment.id == comment_id).first()
-    if not comment:
-        raise HTTPException(status_code=404, detail="Comment not found")
-    if comment.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
-
-    comment.content = updated.content
-    db.commit()
-    db.refresh(comment)
-
-    return comment_to_response(comment, current_user.username)
-
 # Delete comment (only owner)
 @router.delete("/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_comment(comment_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):

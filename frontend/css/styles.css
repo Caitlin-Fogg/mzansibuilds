@@ -125,3 +125,43 @@ button:hover {
     border: 1px solid black;
     padding: 0px;
 }
+
+.milestone-actions {
+    display: flex;
+    border: 1px solid black;
+    gap: 10px;
+    font-size: 14px;
+    margin-top: 6px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.milestone-actions span {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+
+.milestone-actions span:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.comment-actions {
+    display: flex;
+    border: 1px solid black;
+    justify-content: flex-start;
+    margin-top: 6px;
+    font-size: 14px;
+}
+
+.comment-actions span {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+
+.comment-actions span:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}

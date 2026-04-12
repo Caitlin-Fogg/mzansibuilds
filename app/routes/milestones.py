@@ -45,35 +45,9 @@ def get_milestones(project_id: int, db: Session = Depends(get_db)):
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
-    milestones = db.query(models.Milestone).filter(
-        models.Milestone.project_id == project_id
-    ).order_by(models.Milestone.created_at.desc()).all()
+    milestones = db.query(models.Milestone).filter(models.Milestone.project_id == project_id).order_by(models.Milestone.created_at.desc()).all()
 
-    return {
-        "project_owner_id": project.user_id,
-        "milestones": [milestone_to_response(m) for m in milestones]
-    }
-
-# Update milestone
-@router.put("/milestones/{milestone_id}", response_model=schemas.MilestoneResponse)
-def update_milestone(milestone_id: int, updated: schemas.MilestoneCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
-    milestone = db.query(models.Milestone).filter(models.Milestone.id == milestone_id).first()
-
-    if not milestone:
-        raise HTTPException(status_code=404, detail="Milestone not found")
-
-    project = db.query(models.Project).filter(models.Project.id == milestone.project_id).first()
-
-    if project.user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="Not authorized")
-
-    milestone.title = updated.title
-    milestone.description = updated.description
-
-    db.commit()
-    db.refresh(milestone)
-
-    return milestone_to_response(milestone)
+    return {"project_owner_id": project.user_id, "milestones": [milestone_to_response(m) for m in milestones]}
 
 
 # Delete milestone
@@ -85,6 +59,9 @@ def delete_milestone(milestone_id: int, db: Session = Depends(get_db), current_u
         raise HTTPException(status_code=404, detail="Milestone not found")
 
     project = db.query(models.Project).filter(models.Project.id == milestone.project_id).first()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
 
     if project.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized")

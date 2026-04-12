@@ -67,20 +67,15 @@ async function loadMilestones(projectId) {
             const div = document.createElement("div");
 
             div.innerHTML = `
-                <h4 ${isOwner ? 'contenteditable="true"' : ''} id="title-${m.id}">
-                    ${m.title}
-                </h4>
-
-                <p ${isOwner ? 'contenteditable="true"' : ''} id="desc-${m.id}">
-                    ${m.description || ""}
-                </p>
-
-                <small>Created: ${new Date(m.created_at).toLocaleString()}</small>
+                <div>
+                    <h4 id="title-${m.id}">${m.title}</h4>
+                    <p id="desc-${m.id}">${m.description || ""}</p>
+                    <small>Created: ${new Date(m.created_at).toLocaleString()}</small>
+                </div>
 
                 ${isOwner ? `
-                    <div>
-                        <button onclick="saveMilestone(${m.id})">Save</button>
-                        <button onclick="deleteMilestoneUI(${m.id})">Delete</button>
+                    <div class="milestone-actions">
+                        <span onclick="deleteMilestoneUI(${m.id})" title="Delete">🗑️</span>
                     </div>
                 ` : ""}
 
@@ -127,8 +122,8 @@ async function addMilestone() {
 }
 
 async function saveMilestone(id) {
-    const title = document.getElementById(`title-${id}`).innerText;
-    const description = document.getElementById(`desc-${id}`).innerText;
+    const title = document.getElementById(`edit-title-${id}`).value;
+    const description = document.getElementById(`edit-desc-${id}`).value;
 
     try {
         await updateMilestone(id, {
@@ -170,6 +165,13 @@ async function loadComments() {
             div.innerHTML = `
                 <p>${comment.content}</p>
                 <small>By: ${comment.username}</small>
+
+                ${comment.user_id === getCurrentUserId() ? `
+                    <div class="comment-actions">
+                        <span onclick="deleteComment(${comment.id})" title="Delete">🗑️</span>
+                    </div>
+                ` : ""}
+
                 <hr/>
             `;
 
@@ -178,6 +180,18 @@ async function loadComments() {
 
     } catch (error) {
         console.error(error);
+    }
+}
+
+async function deleteComment(id) {
+    if (!confirm("Delete this comment?")) return;
+
+    try {
+        await apiRequest(`/comments/${id}`, "DELETE");
+        loadComments();
+    } catch (err) {
+        console.error(err);
+        alert("Failed to delete comment");
     }
 }
 
