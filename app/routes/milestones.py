@@ -58,6 +58,26 @@ def get_milestones(project_id: int, db: Session = Depends(get_db)):
 
     return {"project_owner_id": project.user_id, "milestones": [milestone_to_response(m) for m in milestones]}
 
+# Update milestone (only project owner)
+@router.put("/milestones/{milestone_id}", response_model=schemas.MilestoneResponse)
+def update_milestone(milestone_id: int, updated: schemas.MilestoneCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    milestone = db.query(models.Milestone).filter(models.Milestone.id == milestone_id).first()
+
+    if not milestone:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+
+    project = db.query(models.Project).filter(models.Project.id == milestone.project_id).first()
+
+    if project.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    milestone.title = updated.title
+    milestone.description = updated.description
+
+    db.commit()
+    db.refresh(milestone)
+
+    return milestone
 
 # Delete milestone
 @router.delete("/milestones/{milestone_id}", status_code=status.HTTP_204_NO_CONTENT)

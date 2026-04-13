@@ -8,6 +8,9 @@ Includes role-based UI (owner vs non-owner)
 let currentProjectId = null;
 let isOwner = false;
 
+// Store original milestone values during edit mode (for updating milestones)
+const milestoneCache = {};
+
 // Extract project id
 function getProjectId() {
     const params = new URLSearchParams(window.location.search);
@@ -84,15 +87,18 @@ async function loadMilestones(projectId) {
         milestones.forEach(m => {
             const div = document.createElement("div");
 
+            div.id = `milestone-${m.id}`; 
+
             div.innerHTML = `
                 <div>
-                    <h4 id="title-${m.id}">${m.title}</h4>
-                    <p id="desc-${m.id}">${m.description || ""}</p>
+                    <h4 class="milestone-title">${m.title}</h4>
+                    <p class="milestone-desc">${m.description || ""}</p>
                     <small>Created: ${new Date(m.created_at).toLocaleString()}</small>
                 </div>
 
                 ${isOwner ? `
                     <div class="milestone-actions">
+                        <span onclick="editMilestone(${m.id})" title="Edit">✏️</span>
                         <span onclick="deleteMilestoneUI(${m.id})" title="Delete">🗑️</span>
                     </div>
                 ` : ""}
@@ -138,6 +144,68 @@ async function addMilestone() {
         console.error(err);
         alert("Failed to add milestone");
     }
+}
+
+// Handles updating milestones
+function editMilestone(id) {
+    const container = document.getElementById(`milestone-${id}`);
+
+    const titleEl = container.querySelector(".milestone-title");
+    const descEl = container.querySelector(".milestone-desc");
+
+    milestoneCache[id] = {
+        title: titleEl.innerText,
+        desc: descEl.innerText
+    };
+
+    titleEl.outerHTML = `
+        <input class="edit-title" value="${milestoneCache[id].title}" />
+    `;
+
+    descEl.outerHTML = `
+        <textarea class="edit-desc">${milestoneCache[id].desc}</textarea>
+    `;
+
+    container.querySelector(".milestone-actions").innerHTML = `
+        <span onclick="saveMilestone(${id})">✅</span>
+        <span onclick="cancelEdit(${id})">❌</span>
+    `;
+}
+
+// Saving changes to milestone
+async function saveMilestone(id) {
+    const container = document.getElementById(`milestone-${id}`);
+
+    const title = container.querySelector(".edit-title").value;
+    const description = container.querySelector(".edit-desc").value;
+
+    try {
+        await updateMilestone(id, { title, description });
+
+        loadMilestones(currentProjectId);
+
+    } catch (err) {
+        console.error(err);
+        alert("Update failed");
+    }
+}
+
+// Cancelling update
+function cancelEdit(id) {
+    const container = document.getElementById(`milestone-${id}`);
+
+    const original = milestoneCache[id];
+
+    container.querySelector(".edit-title").outerHTML =
+        `<h4 class="milestone-title">${original.title}</h4>`;
+
+    container.querySelector(".edit-desc").outerHTML =
+        `<p class="milestone-desc">${original.desc}</p>`;
+
+    container.querySelector(".milestone-actions").innerHTML = `
+        <span onclick="editMilestone(${id})">✏️</span>
+        <span onclick="deleteMilestoneUI(${id})">🗑️</span>
+    `;
 }
 
 // Delete milestone

@@ -57,7 +57,11 @@ async function loadMyProjects() {
                 <h3>Delete Project</h3>
                 <button onclick="handleDelete(${p.id})">Delete</button>
 
+                <h3>View All Project Details</h3>
+                <button onclick="viewProject(${p.id})">View</button>
+
                 <hr>
+
             `;
 
             container.appendChild(div);
@@ -67,6 +71,11 @@ async function loadMyProjects() {
         console.error(err);
         alert("Failed to load projects");
     }
+}
+
+// Navigate to project detail page
+function viewProject(id) {
+    window.location.href = `project.html?id=${id}`;
 }
 
 // Handle project update submission
