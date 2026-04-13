@@ -5,9 +5,20 @@ from app import models, schemas
 from app.database import get_db
 from app.routes.users import get_current_user
 
+'''
+Handles collaboration requests between users:
+- Sending requests to join projects
+- Viewing requests (owner and requester)
+- Accepting/rejecting requests
+- Deleting requests
+Includes authorisation checks for both project owners and request creators
+'''
+
 router = APIRouter(tags=["Collaboration Requests"])
 
 # Helper function
+# Convert CollaborationRequest model to response format
+# Includes username and project title for frontend display
 def collab_to_response(req: models.CollaborationRequest, username: str, project_title: str):
     return schemas.CollaborationRequestResponse(
         id=req.id,
@@ -61,7 +72,7 @@ def get_requests(project_id: int, db: Session = Depends(get_db), current_user: m
 
     return [collab_to_response(req, username, project_title) for req, username, project_title in results]
 
-# Get user's requests
+# Get user's own requests
 @router.get("/requests/me", response_model=List[schemas.CollaborationRequestResponse])
 def get_my_requests(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     results = (
@@ -69,7 +80,7 @@ def get_my_requests(db: Session = Depends(get_db), current_user: models.User = D
 
     return [collab_to_response(req, username, project_title) for req, username, project_title in results]
 
-# Accept request
+# Accept request (only project owner can accept)
 @router.put("/requests/{request_id}/accept", response_model=schemas.CollaborationRequestResponse)
 def accept_request(request_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     req = db.query(models.CollaborationRequest).filter(models.CollaborationRequest.id == request_id).first()
@@ -90,7 +101,7 @@ def accept_request(request_id: int, db: Session = Depends(get_db), current_user:
     return collab_to_response(req, user.username, project.title)
 
 
-# Reject request
+# Reject request (only project owner can reject)
 @router.put("/requests/{request_id}/reject", response_model=schemas.CollaborationRequestResponse)
 def reject_request(request_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     req = db.query(models.CollaborationRequest).filter(models.CollaborationRequest.id == request_id).first()

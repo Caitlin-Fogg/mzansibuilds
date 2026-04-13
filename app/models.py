@@ -3,7 +3,12 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
 
-# User Model
+'''
+This file defines SQLAlchemy models that map to database tables
+These models represent the structure of the database and relationships between entities
+'''
+
+# User Model - stores registered user information
 class User(Base):
     __tablename__ = "users"
 
@@ -19,7 +24,7 @@ class User(Base):
     collaboration_requests = relationship("CollaborationRequest", back_populates="user", cascade="all, delete, delete-orphan")
 
 
-# Project Model
+# Project Model - each project belongs to a user (owner)
 class Project(Base):
     __tablename__ = "projects"
 
@@ -43,7 +48,7 @@ class Project(Base):
     collaboration_requests = relationship("CollaborationRequest", back_populates="project", cascade="all, delete, delete-orphan")
 
 
-# Milestone Model
+# Milestone Model - represents a project milestone linked to a specific project
 class Milestone(Base):
     __tablename__ = "milestones"
 
@@ -57,7 +62,7 @@ class Milestone(Base):
     project = relationship("Project", back_populates="milestones")
 
 
-# Comment Model
+# Comment Model - stores comments made by users on projects
 class Comment(Base):
     __tablename__ = "comments"
 
@@ -72,7 +77,7 @@ class Comment(Base):
     user = relationship("User", back_populates="comments")
 
 
-# CollaborationRequest Model
+# CollaborationRequest Model - tracks requests made by users to collaborate on projects
 class CollaborationRequest(Base):
     __tablename__ = "collaboration_requests"
 

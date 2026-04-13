@@ -5,9 +5,17 @@ from app import models, schemas
 from app.database import get_db
 from app.routes.users import get_current_user
 
+'''
+Handles project comments:
+- Creating comments
+- Retrieving comments for a project
+- Deleting comments (with ownership enforcement)
+'''
+
 router = APIRouter(tags=["Comments"])
 
 # Helper function
+# Convert Comment model to response schema including username
 def comment_to_response(comment: models.Comment, username: str) -> schemas.CommentResponse:
     return schemas.CommentResponse(
         id=comment.id,
@@ -43,6 +51,7 @@ def get_comments(project_id: int, db: Session = Depends(get_db)):
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
 
+    # Join with User table to fetch usernames efficiently
     results = (db.query(models.Comment, models.User.username).join(models.User, models.Comment.user_id == models.User.id).filter(models.Comment.project_id == project_id).all())
 
     return [comment_to_response(comment, username) for comment, username in results]

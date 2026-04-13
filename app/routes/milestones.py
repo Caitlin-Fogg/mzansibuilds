@@ -5,9 +5,18 @@ from app import models, schemas
 from app.database import get_db
 from app.routes.users import get_current_user
 
+'''
+Handles project milestones:
+- Creating milestones for a project
+- Retrieving milestones
+- Deleting milestones
+Includes ownership checks to ensure only project owners can modify milestones
+'''
+
 router = APIRouter(tags=["Milestones"])
 
 # Helper function
+# Convert Milestone model to API response format
 def milestone_to_response(milestone: models.Milestone) -> schemas.MilestoneResponse:
     return schemas.MilestoneResponse(
         id=milestone.id,
@@ -36,7 +45,7 @@ def create_milestone(project_id: int, milestone: schemas.MilestoneCreate, db: Se
     return milestone_to_response(db_milestone)
 
 
-# Get milestones for a project
+# Get milestones for a project (publicly available)
 @router.get("/projects/{project_id}/milestones", response_model=schemas.MilestoneListResponse)
 def get_milestones(project_id: int, db: Session = Depends(get_db)):
 

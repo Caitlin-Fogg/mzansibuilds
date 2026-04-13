@@ -8,6 +8,13 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 
+'''
+Handles all user-related functionality including:
+- Registration
+- Authentication (login with JWT)
+- Profile management
+- Secure password handling
+'''
 
 # Router setup
 router = APIRouter(
@@ -16,31 +23,41 @@ router = APIRouter(
 )
 
 # Security settings
-SECRET_KEY = "your-very-secret-key"  # replace with a strong random key in production
+# Secret key used to sign JWT tokens (must be kept secure in production)
+SECRET_KEY = "your-very-secret-key"
+# Algorithm used for token signing
 ALGORITHM = "HS256"
+# Token expiry duration
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
+# Password hashing context using Argon2 (secure hashing algorithm)
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
+# OAuth2 scheme used to extract token from requests
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 # Helper functions
+# Hash plain text password before storing in database
 def hash_password(password: str):
     return pwd_context.hash(password)
 
+# Verify plain password against hashed password
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+# Generate JWT access token with expiration time
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+# Extract and validate user from JWT token
+# Used to protect routes that require authentication
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials"
-    )
+    # Decodes JWT token and extracts user details
+    # If token is invalid or expired it raises authentication error
+    # Retrieves user from database using email stored in token
+    credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
@@ -57,7 +74,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 # Create a new user
 @router.post("/", response_model=schemas.UserResponse)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    # Check if username or email already exists
+    # Check if username or email already exists to prevent duplicates
     existing_user = db.query(models.User).filter((models.User.username == user.username) | (models.User.email == user.email)).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username or email already registered")
@@ -69,7 +86,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
     return new_user
 
-# Login user
+# Login user - verifies email and password, returns the token for authenticated access
 @router.post("/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == form_data.username).first()
@@ -81,7 +98,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     token = create_access_token(data={"sub": user.email, "user_id": user.id}, expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return {"access_token": token, "token_type": "bearer"}
 
-# Get current user profile
+# Get current logged in user profile
 @router.get("/me", response_model=schemas.UserResponse)
 def read_current_user(current_user: models.User = Depends(get_current_user)):
     return current_user
@@ -94,7 +111,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-# Update user
+# Update user - only accessible to authenticated user
 @router.put("/me", response_model=schemas.UserResponse)
 def update_user(updated_user: schemas.UserUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     # Check if new username/email already exists
@@ -123,7 +140,7 @@ def update_user(updated_user: schemas.UserUpdate, db: Session = Depends(get_db),
 
     return current_user
 
-# Delete user
+# Delete user - requires password confirmation
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user_data: schemas.UserDelete, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
     # Verify password

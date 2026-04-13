@@ -2,16 +2,25 @@ from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, Literal, List
 from datetime import datetime
 
-# Allowed values
+'''
+This file defines Pydantic schemas used for:
+- Validating incoming request data
+- Structuring API responses
+- Ensuring data consistency between client and server
+'''
+
+# Allowed values - restricts values for certain fields to help with input validation
 ProjectStage = Literal["idea", "planning", "development", "completed"]
 ProjectStatus = Literal["active", "completed"]
 CollabStatus = Literal["pending", "accepted", "rejected"]
 
 # User Schemas
+# Base schema shared across user-related operations
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=30)
     email: EmailStr
 
+# Schema used when registering a new user (includes password)
 class UserCreate(UserBase):
     password: str = Field(..., min_length=6, max_length=50)
 
@@ -23,6 +32,7 @@ class UserUpdate(BaseModel):
 class UserDelete(BaseModel):
     password: str
 
+ # Schema returned to the client (excludes sensitive data like password)
 class UserResponse(UserBase):
     id: int
     created_at: datetime
@@ -32,6 +42,7 @@ class UserResponse(UserBase):
 
 
 # Project Schemas
+# Base project schema with validation rules to ensure clean and safe input
 class ProjectBase(BaseModel):
     title: str = Field(..., min_length=3, max_length=100)
     description: Optional[str] = Field(None, max_length=1000)
@@ -42,6 +53,7 @@ class ProjectBase(BaseModel):
 class ProjectCreate(ProjectBase):
     pass
 
+# All fields optional to allow partial updates
 class ProjectUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
@@ -49,6 +61,7 @@ class ProjectUpdate(BaseModel):
     support_needed: Optional[str] = None
     status: Optional[ProjectStatus] = None
 
+# Response schema includes additional fields such as user info and timestamps
 class ProjectResponse(ProjectBase):
     id: int
     title: str
@@ -81,6 +94,7 @@ class MilestoneResponse(MilestoneBase):
     class Config:
         from_attributes = True
 
+# Wrapper response including project owner and associated milestones
 class MilestoneListResponse(BaseModel):
     project_owner_id: int
     milestones: list[MilestoneResponse]
@@ -91,6 +105,7 @@ class MilestoneListResponse(BaseModel):
 
 # Comment Schemas
 class CommentBase(BaseModel):
+    # Ensures comments are not empty and limits size
     content: str = Field(..., min_length=1, max_length=1000)
 
 
