@@ -1,9 +1,14 @@
+// Handles display and management of the current user's projects
+// Includes update and delete functionality
+
+// Ensure only authenticated users can access this page
 function checkAuth() {
     const token = localStorage.getItem("token");
     if (!token) window.location.href = "home-page.html";
 }
 checkAuth();
 
+// Fetch and display projects created by the current user
 async function loadMyProjects() {
     try {
         const projects = await getMyProjects();
@@ -64,9 +69,11 @@ async function loadMyProjects() {
     }
 }
 
+// Handle project update submission
 async function handleUpdate(event, id) {
     event.preventDefault();
 
+    // Build update using only changed fields
     const data = {};
 
     const title = document.getElementById(`title-${id}`).value;
@@ -82,8 +89,10 @@ async function handleUpdate(event, id) {
     if (status) data.status = status;
 
     try {
+        // Send update request to backend
         await updateProject(id, data);
         alert("Project updated!");
+        // Reload
         loadMyProjects();
     } catch (err) {
         console.error(err);
@@ -91,12 +100,15 @@ async function handleUpdate(event, id) {
     }
 }
 
+// Handle project deletion
 async function handleDelete(id) {
     if (!confirm("Are you sure you want to delete this project?")) return;
 
     try {
+        // Call API to delete project
         await deleteProject(id);
         alert("Project deleted");
+        // Reload
         loadMyProjects();
     } catch (err) {
         console.error(err);

@@ -1,3 +1,7 @@
+// Handles display of collaboration requests made by the current user
+// Allows users to view status and delete pending/rejected requests
+
+// Fetch and display user's collaboration requests
 async function loadMyRequests() {
     try {
         const requests = await getMyRequests();
@@ -5,6 +9,7 @@ async function loadMyRequests() {
         const container = document.getElementById("myRequests");
         container.innerHTML = "";
 
+        // Render requests
         requests.forEach(req => {
             const div = document.createElement("div");
             div.classList.add("request-item");
@@ -15,6 +20,7 @@ async function loadMyRequests() {
                 <p>Status: ${req.status}</p>
 
                 ${
+                    // Show delete option only for pending or rejected requests
                     (req.status === "pending" || req.status === "rejected")
                     ? `
                         <div class="request-actions">
@@ -35,11 +41,14 @@ async function loadMyRequests() {
     }
 }
 
+// Delete a collaboration request
 async function deleteRequest(id) {
     if (!confirm("Delete this collaboration request?")) return;
 
     try {
+        // Call API to delete request
         await deleteCollaborationRequest(id);
+        // Reload
         loadMyRequests();
     } catch (err) {
         console.error(err);

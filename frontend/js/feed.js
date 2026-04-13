@@ -1,3 +1,5 @@
+// Handles live project feed display
+
 // Function to check if users are logged in
 // To view the live feed, a user must be logged in. If they are not, they will be redirected to the home page
 function checkAuth() {
@@ -10,17 +12,22 @@ function checkAuth() {
 
 checkAuth();
 
+// Fetch and display active projects
 async function loadProjects() {
     try {
+        // Debug log to track loading state
         console.log("Loading projects...");
 
+        // Fetch active projects from backend
         const projects = await apiRequest("/projects/active");
 
         console.log("SUCCESS:", projects);
 
         const container = document.getElementById("projects");
+        // Clear existing content before rendering
         container.innerHTML = "";
 
+        // Rendering projects
         projects.forEach(project => {
             const div = document.createElement("div");
 

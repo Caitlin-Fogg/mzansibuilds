@@ -1,22 +1,34 @@
+/* Handles project detail page:
+- Displaying project info
+- Managing milestones, comments and collaboration requests
+Includes role-based UI (owner vs non-owner)
+*/
+
+// Store current project ID and ownership state
 let currentProjectId = null;
 let isOwner = false;
 
+// Extract project id
 function getProjectId() {
     const params = new URLSearchParams(window.location.search);
     return params.get("id");
 }
 
+// Check if page is in read-only mode (used for Celebration Wall)
 function isReadOnly() {
     const params = new URLSearchParams(window.location.search);
     return params.get("readonly") === "true";
 }
 
+// Fetch and display project details
 async function loadProject() {
     const id = getProjectId();
 
     try {
+        // Retrieve project data from backend
         const project = await apiRequest(`/projects/${id}`);
 
+        // Populate UI with project details
         document.getElementById("title").innerText = project.title;
         document.getElementById("description").innerText = project.description;
         document.getElementById("stage").innerText = "Stage: " + project.stage;
@@ -30,6 +42,9 @@ async function loadProject() {
 
         const readOnly = isReadOnly();
 
+        // Show collaboration UI based on ownership and mode
+        // If user is owner - show incoming requests
+        // If not owner - allow sending collaboration request
         if (!readOnly) {
             if (Number(currentUserId) === Number(project.user_id)) {
                 document.getElementById("collabRequestsSection").style.display = "block";
@@ -49,6 +64,7 @@ async function loadProject() {
     }
 }
 
+// Fetch and display milestones for the project
 async function loadMilestones(projectId) {
     try {
         const data = await getMilestones(projectId);
@@ -61,8 +77,10 @@ async function loadMilestones(projectId) {
         const milestones = data.milestones;
 
         const readOnly = isReadOnly();
+        // Determine ownership (controls UI permissions)
         isOwner = Number(ownerId) === Number(currentUserId) && !readOnly;
 
+        // Render each milestone
         milestones.forEach(m => {
             const div = document.createElement("div");
 
@@ -104,6 +122,7 @@ async function loadMilestones(projectId) {
     }
 }
 
+// Add a new milestone (owner only)
 async function addMilestone() {
     const title = document.getElementById("newMilestoneTitle").value;
     const description = document.getElementById("newMilestoneDesc").value;
@@ -121,23 +140,7 @@ async function addMilestone() {
     }
 }
 
-async function saveMilestone(id) {
-    const title = document.getElementById(`edit-title-${id}`).value;
-    const description = document.getElementById(`edit-desc-${id}`).value;
-
-    try {
-        await updateMilestone(id, {
-            title,
-            description
-        });
-
-        loadMilestones(currentProjectId);
-    } catch (err) {
-        console.error(err);
-        alert("Failed to update milestone");
-    }
-}
-
+// Delete milestone
 async function deleteMilestoneUI(id) {
     if (!confirm("Delete this milestone?")) return;
 
@@ -150,15 +153,19 @@ async function deleteMilestoneUI(id) {
     }
 }
 
+// Load comments for the project
 async function loadComments() {
     const id = getProjectId();
 
     try {
+        // Fetch comments from backend
         const comments = await apiRequest(`/projects/${id}/comments`);
 
         const container = document.getElementById("comments");
         container.innerHTML = "";
 
+        // Render comments with username
+        // Show delete option only for comment owner
         comments.forEach(comment => {
             const div = document.createElement("div");
 
@@ -183,6 +190,7 @@ async function loadComments() {
     }
 }
 
+// Delete a comment (only allowed for owner)
 async function deleteComment(id) {
     if (!confirm("Delete this comment?")) return;
 
@@ -195,12 +203,15 @@ async function deleteComment(id) {
     }
 }
 
+// Decode JWT token to extract user information
 function parseJwt(token) {
     const base64Url = token.split('.')[1];
     const base64 = atob(base64Url);
     return JSON.parse(base64);
 }
 
+// Get current user ID from stored JWT token
+// Used to determine ownership and control UI behaviour
 function getCurrentUserId() {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -218,6 +229,7 @@ function getCurrentUserId() {
     }
 }
 
+// Handle new comment submission
 document.getElementById("commentForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -225,6 +237,7 @@ document.getElementById("commentForm")?.addEventListener("submit", async (e) => 
     const text = document.getElementById("commentText").value;
 
     try {
+        // Send comment to backend
         await apiRequest(`/projects/${id}/comments`, "POST", {
             content: text
         });
@@ -238,6 +251,7 @@ document.getElementById("commentForm")?.addEventListener("submit", async (e) => 
     }
 });
 
+// Handle collaboration request submission
 document.getElementById("collabForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -245,6 +259,7 @@ document.getElementById("collabForm")?.addEventListener("submit", async (e) => {
     const message = document.getElementById("collabMessage").value;
 
     try {
+        // Send request with optional message
         await requestCollaboration(id, message);
         alert("Request sent!");
         document.getElementById("collabMessage").value = "";
@@ -254,6 +269,7 @@ document.getElementById("collabForm")?.addEventListener("submit", async (e) => {
     }
 });
 
+// Load collaboration requests for project (owner only)
 async function loadCollabRequests(projectId) {
     try {
         const requests = await getProjectRequests(projectId);
@@ -284,11 +300,13 @@ async function loadCollabRequests(projectId) {
     }
 }
 
+// Accept collaboration request
 async function handleAccept(id) {
     await acceptRequest(id);
     loadCollabRequests(getProjectId());
 }
 
+// Reject collaboration request
 async function handleReject(id) {
     await rejectRequest(id);
     loadCollabRequests(getProjectId());
