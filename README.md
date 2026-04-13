@@ -85,6 +85,7 @@ Ensure backend is set up correctly and started before using the UI.
 
 - To stop the server, press CTRL + C.
 - The backend runs at: http://127.0.0.1:8000
+- Swagger UI for testing: http://127.0.0.1:8000/docs
 
 ## 3. Frontend Setup (Recommended method - Visual Studio Code)
 - Install the extension for viewing html files: Live Preview
