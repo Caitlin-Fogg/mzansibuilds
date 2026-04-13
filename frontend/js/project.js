@@ -60,6 +60,7 @@ async function loadProject() {
         currentProjectId = id;
 
         loadMilestones(id, currentUserId);
+        loadCollaborators(id);
 
     } catch (error) {
         console.error(error);
@@ -360,6 +361,32 @@ async function loadCollabRequests(projectId) {
                 }
             `;
 
+            container.appendChild(div);
+        });
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+// Get collaborators for a project
+async function loadCollaborators(projectId) {
+    try {
+        const collaborators = await getCollaborators(projectId);
+
+        const container = document.getElementById("collaborators");
+        container.innerHTML = "";
+
+        if (collaborators.length === 0) {
+            container.innerHTML = "<p>No collaborators</p>";
+            return;
+        }
+
+        collaborators.forEach(c => {
+            const div = document.createElement("div");
+            div.innerHTML = `
+                <p>👤 ${c.username}</p>
+            `;
             container.appendChild(div);
         });
 

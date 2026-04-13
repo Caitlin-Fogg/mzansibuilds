@@ -100,6 +100,24 @@ def accept_request(request_id: int, db: Session = Depends(get_db), current_user:
     user = db.query(models.User).filter(models.User.id == req.user_id).first()
     return collab_to_response(req, user.username, project.title)
 
+# Retrieve accepted collaborators
+@router.get("/projects/{project_id}/collaborators", response_model=List[schemas.CollaborationRequestResponse])
+def get_collaborators(project_id: int, db: Session = Depends(get_db)):
+    results = (
+        db.query(models.CollaborationRequest, models.User.username, models.Project.title)
+        .join(models.User, models.CollaborationRequest.user_id == models.User.id)
+        .join(models.Project, models.CollaborationRequest.project_id == models.Project.id)
+        .filter(
+            models.CollaborationRequest.project_id == project_id,
+            models.CollaborationRequest.status == "accepted"
+        )
+        .all()
+    )
+
+    return [
+        collab_to_response(req, username, project_title)
+        for req, username, project_title in results
+    ]
 
 # Reject request (only project owner can reject)
 @router.put("/requests/{request_id}/reject", response_model=schemas.CollaborationRequestResponse)

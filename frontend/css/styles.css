@@ -87,7 +87,7 @@ button:hover {
     background-color: black;
 
   
-    border: 1px solid black;
+    border: none;
     margin-top: 0px;
     margin-bottom: 0px;
     border-radius: 1px;
@@ -96,7 +96,7 @@ button:hover {
 
 .nav-left {
     background-color: black;
-    border: 1px solid black;
+    border: none;
     display: flex;
     align-items: center;
     padding: 0px;
@@ -112,7 +112,7 @@ button:hover {
 
 .nav-right {
     padding: 0px;
-    border: 1px solid black;
+    border: none;
     display: flex;
     align-items: center;
     margin-top: 0px;
@@ -128,13 +128,13 @@ button:hover {
 }
 
 #collabRequests {
-    border: 1px solid black;
+    border: none;
     padding: 0px;
 }
 
 .milestone-actions {
     display: flex;
-    border: 1px solid black;
+    border: none;
     gap: 10px;
     font-size: 14px;
     margin-top: 6px;
@@ -155,7 +155,7 @@ button:hover {
 
 .comment-actions {
     display: flex;
-    border: 1px solid black;
+    border: none;
     justify-content: flex-start;
     margin-top: 6px;
     font-size: 14px;
@@ -174,7 +174,7 @@ button:hover {
 
 .request-actions {
     display: flex;
-    border: 1px solid black;
+    border: none;
     gap: 10px;
     font-size: 14px;
     margin-top: 6px;
@@ -191,4 +191,9 @@ button:hover {
 .request-actions span:hover {
     opacity: 1;
     transform: scale(1.1);
+}
+
+#collaborators div {
+    border: none;
+    padding: 2px 0;
 }

@@ -87,6 +87,11 @@ function getMyRequests() {
     return apiRequest(`/requests/me`);
 }
 
+// Get accepted collaborators
+function getCollaborators(projectId) {
+    return apiRequest(`/projects/${projectId}/collaborators`);
+}
+
 // Accept a collaboration request (owner action)
 function acceptRequest(requestId) {
     return apiRequest(`/requests/${requestId}/accept`, "PUT");
