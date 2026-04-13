@@ -79,7 +79,8 @@ Ensure backend is set up correctly and started before using the UI.
 - Note: Use the folder name that you clone the repository to on your device e.g. mzansibuilds
 - Run the following commands:
   - cd mzansibuilds
-  - venv\Scripts\activate
+  - python -m venv venv (Create the virtual environment if you want to use one, although not necessarily required)
+  - venv\Scripts\activate (If using venv)
   - pip install -r requirements.txt (Install dependencies)
   - uvicorn app.main:app --reload (Run the FastAPI server)
 
@@ -89,7 +90,7 @@ Ensure backend is set up correctly and started before using the UI.
 
 ## 3. Frontend Setup (Recommended method - Visual Studio Code)
 - Install the extension for viewing html files: Live Preview
-- Once installed, open the project in VS Code and navigate to the frotend folder
+- Once installed, open the project in VS Code and navigate to the frontend folder
 - Inside is all the frontend files
 - To see the UI display, right click on an html file and click "Show Preview"
 - The user flow begins at home-page.html
