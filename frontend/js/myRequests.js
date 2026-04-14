@@ -9,6 +9,11 @@ async function loadMyRequests() {
         const container = document.getElementById("myRequests");
         container.innerHTML = "";
 
+        if (requests.length === 0) {
+            container.innerHTML = "<p>No requests yet</p>";
+            return;
+        }
+
         // Render requests
         requests.forEach(req => {
             const div = document.createElement("div");

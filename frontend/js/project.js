@@ -355,6 +355,11 @@ async function loadCollabRequests(projectId) {
         const container = document.getElementById("collabRequests");
         container.innerHTML = "";
 
+        if (requests.length === 0) {
+            container.innerHTML = "<p>No requests yet</p>";
+            return;
+        }
+
         requests.forEach(req => {
             const div = document.createElement("div");
 
