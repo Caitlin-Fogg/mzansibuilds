@@ -84,6 +84,10 @@ async function loadMilestones(projectId) {
         // Determine ownership (controls UI permissions)
         isOwner = Number(ownerId) === Number(currentUserId) && !readOnly;
 
+        if (milestones.length === 0) {
+            container.innerHTML = "<p>No milestones</p>";
+        }
+
         // Render each milestone
         milestones.forEach(m => {
             const div = document.createElement("div");
@@ -232,6 +236,11 @@ async function loadComments() {
 
         const container = document.getElementById("comments");
         container.innerHTML = "";
+
+        if (comments.length === 0) {
+            container.innerHTML = "<p>No comments</p>";
+            return;
+        }
 
         // Render comments with username
         // Show delete option only for comment owner
