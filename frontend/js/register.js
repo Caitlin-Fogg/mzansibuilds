@@ -22,6 +22,6 @@ document.getElementById("registerForm")?.addEventListener("submit", async (e) =>
 
     } catch (error) {
         console.error(error);
-        alert("Registration failed");
+        alert("Registration failed - Duplicate/Invalid Field");
     }
 });

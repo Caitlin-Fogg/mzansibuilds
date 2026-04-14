@@ -10,7 +10,7 @@ async function loadMyRequests() {
         container.innerHTML = "";
 
         if (requests.length === 0) {
-            container.innerHTML = "<p>No requests yet</p>";
+            container.innerHTML = "<p>No requests have been made yet</p>";
             return;
         }
 
