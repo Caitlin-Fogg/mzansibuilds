@@ -413,6 +413,7 @@ async function loadCollaborators(projectId) {
 async function handleAccept(id) {
     await acceptRequest(id);
     loadCollabRequests(getProjectId());
+    loadCollaborators(projectId);
 }
 
 // Reject collaboration request
